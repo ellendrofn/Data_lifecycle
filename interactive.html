@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Lifecycle Presentation</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff; 
+            margin: 0;
+            padding: 0;
+            scroll-behavior: smooth;
+        }
+        .container {
+            width: 100%;
+            max-width: 1152px; /* max-w-6xl from Tailwind */
+            margin-left: auto;
+            margin-right: auto;
+            padding: 2rem; /* p-8 for md, p-4 for default */
+        }
+        @media (max-width: 768px) { /* Corresponds to md breakpoint in Tailwind */
+            .container {
+                padding: 1rem; /* p-4 */
+            }
+        }
+
+        .logo-container {
+            display: flex; 
+            justify-content: flex-end; 
+            padding-right: 2rem; 
+            margin-bottom: 1.5rem;
+        }
+        .logo-container img {
+            max-width: 250px; 
+            height: auto;
+        }
+
+        .lifecycle-stage {
+            background-color: rgb(245, 245, 245); 
+            border: 1px solid #e0e0e0; 
+            border-radius: 0.75rem; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); 
+            margin-bottom: 1rem;
+            min-height: 180px; 
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .lifecycle-stage:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .stage-modal-trigger { 
+            cursor: pointer;
+        }
+
+        .stage-title {
+            background-color: rgb(16, 9, 159); 
+            color: white; 
+            padding: 0.75rem 1rem; 
+            margin: -1px -1px 0.75rem -1px; 
+            border-top-left-radius: 0.75rem;
+            border-top-right-radius: 0.75rem;
+            font-size: 1.1em; 
+            font-weight: 600; 
+            text-align: center;
+        }
+
+        .keywords { /* This class is on the UL element in the diagram boxes */
+            font-size: 0.95em; 
+            color: #334155; 
+            list-style-type: none; 
+            padding: 0 1rem 1rem 1rem; 
+            flex-grow: 1; 
+        }
+
+        .keywords li { 
+            padding-left: 1em; 
+            position: relative;
+            margin-bottom: 0.35rem; 
+        }
+
+        .keywords li::before { 
+            content: "•";
+            color: rgb(16, 9, 159); 
+            position: absolute;
+            left: 0;
+            font-size: 1em; 
+        }
+
+        .keywords a { 
+            color: #0369a1; 
+            text-decoration: underline;
+        }
+        .keywords a:hover {
+            color: #075985; 
+        }
+        .keywords .fa-external-link-alt, .keywords .fa-file-pdf, .keywords .fa-video {
+            font-size: 0.8em; 
+            margin-left: 4px;
+        }
+         .keywords a.interactive-link { /* For links that trigger on-page detail sections */
+            cursor: pointer;
+            font-weight: 600; 
+        }
+        
+        .arrow-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0.5rem 0;
+        }
+
+        .arrow-down i, .arrow-right i {
+            font-size: 1.8rem; 
+            color: rgb(16, 9, 159); 
+        }
+
+        .diagram-main-container {
+            margin-bottom: 2rem; 
+        }
+        .diagram-row {
+            display: flex;
+            justify-content: space-around; 
+            align-items: stretch; 
+            margin-bottom: 1rem;
+            gap: 1rem; 
+        }
+        .diagram-row .lifecycle-stage { 
+            flex-basis: 30%; 
+        }
+
+        .diagram-row-interpretation-sharing {
+            display: flex;
+            justify-content: center;
+            align-items: stretch; 
+            gap: 1rem; 
+            margin-bottom: 1rem;
+        }
+
+        .diagram-row-interpretation-sharing .lifecycle-stage {
+            flex: 1; 
+            max-width: 40%; 
+        }
+        .diagram-row-interpretation-sharing .arrow-container {
+            flex-shrink: 0; 
+            display: flex; 
+            align-items: center; 
+        }
+
+        .diagram-row-archiving {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+        .diagram-row-archiving .lifecycle-stage {
+            width: 60%; 
+            max-width: 500px;
+        }
+
+        @media (max-width: 768px) { 
+            .logo-container {
+                padding-right: 1rem; 
+            }
+            .diagram-row, .diagram-row-interpretation-sharing {
+                flex-direction: column;
+                align-items: center; 
+            }
+            .diagram-row .lifecycle-stage, 
+            .diagram-row-interpretation-sharing .lifecycle-stage,
+            .diagram-row-archiving .lifecycle-stage {
+                flex-basis: auto; 
+                width: 90%; 
+                max-width: 400px; 
+                margin-bottom: 1rem;
+            }
+            .diagram-row-interpretation-sharing .arrow-container {
+                transform: rotate(90deg); 
+                margin: 1rem 0; 
+            }
+        }
+        .main-title {
+            color: #1e293b; 
+            text-align: center;
+            margin-bottom: 0.75rem; 
+        }
+        .main-subtitle {
+            color: rgb(16, 9, 159); 
+            text-align: center;
+            margin-bottom: 1rem; 
+            font-weight: 600;
+        }
+        .instructions {
+            font-size: 0.9em;
+            text-align: center;
+            color: #475569; 
+            margin-bottom: 2.5rem; 
+        }
+
+        .service-box-container {
+            margin-top: 3rem; 
+            display: flex;
+            justify-content: center; 
+        }
+        .service-box {
+            background-color: rgba(45, 210, 192, 0.15); 
+            border: 1px solid rgba(45, 210, 192, 0.3); 
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            width: 100%;
+            max-width: 600px; 
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .service-box h3 {
+            color: rgb(16, 9, 159);
+            font-size: 1.25em;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            text-align: center;
+        }
+        .service-box ul {
+            font-size: 0.9em; 
+            color: #334155; 
+            list-style-type: none; 
+            padding-left: 0;
+        }
+        .service-box ul li {
+            padding-left: 1em; 
+            position: relative;
+            margin-bottom: 0.35rem;
+        }
+        .service-box ul li::before {
+            content: "•";
+            color: rgb(16, 9, 159);
+            position: absolute;
+            left: 0;
+        }
+        .service-box a {
+            color: #0369a1; 
+            text-decoration: underline;
+        }
+        .service-box a:hover {
+            color: #075985; 
+        }
+
+        /* Generic Content Modal Styles (for stage box clicks) */
+        .modal-overlay-generic {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            display: none; 
+        }
+        .modal-content-generic {
+            background-color: #fff;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            width: 80%;
+            max-width: 800px; 
+            max-height: 80vh; 
+            overflow-y: auto; 
+            position: relative;
+        }
+        .modal-close-button-generic {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 2.2rem;
+            color: #555;
+            cursor: pointer;
+            line-height: 1;
+        }
+        .modal-close-button-generic:hover {
+            color: #000;
+        }
+        #modalStageTitle {
+            font-size: 2em; 
+            color: rgb(16, 9, 159);
+            margin-bottom: 1.5rem; 
+            padding-bottom: 0.75rem; 
+            border-bottom: 2px solid #e0f2fe;
+        }
+        #modalStageContent { 
+            font-size: 1.25em; 
+            line-height: 1.6; 
+        }
+        #modalStageContent ul.keywords { 
+            padding: 0; 
+            margin:0; 
+            list-style-type: none !important; 
+        }
+        #modalStageContent ul.keywords li { 
+            margin-bottom: 0.6em; 
+        }
+        #modalStageContent a { 
+            color: #0369a1;
+            text-decoration: underline;
+        }
+        #modalStageContent a:hover {
+            color: #075985;
+        }
+
+        /* Detail Section Styles (for bullet point clicks) */
+        .detail-section-container {
+            margin-top: 30px;
+        }
+        .detail-section { 
+            background-color: #ffffff; 
+            border: 2px solid #0ea5e9; 
+            border-radius: 0.75rem; 
+            padding: 1.5rem; 
+            margin-top: 1.5rem; 
+            margin-bottom: 1.5rem; 
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            display: none; /* Initially hidden */
+        }
+        .detail-section h3 {
+            color: #0f769e; 
+            margin-bottom: 1rem; 
+            font-size: 1.5em; 
+            font-weight: 600;
+            text-align: left; 
+            border-bottom: 1px solid #e0f2fe;
+            padding-bottom: 0.5rem;
+        }
+        .detail-section p, .detail-section ul {
+            color: #334155; 
+            line-height: 1.6;
+            margin-bottom: 1rem;
+            font-size: 0.9em;
+        }
+        .detail-section ul {
+            list-style-type: disc; 
+            padding-left: 20px; 
+        }
+        .detail-section ul ul { 
+            list-style-type: circle; 
+            margin-top: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .detail-section .example-question { 
+            font-style: italic;
+            background-color: #f9fafb; 
+            padding: 0.5rem;
+            border-left: 3px solid #38bdf8; 
+            margin-left: 1rem; 
+            margin-top: 0.25rem;
+            margin-bottom: 0.5rem;
+        }
+         .detail-section h4 { 
+            font-weight: 600;
+            color: #1e293b; 
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 1rem;
+            padding: 0.5rem 1rem;
+            background-color: #38bdf8; 
+            color: white; 
+            border-radius: 0.375rem; 
+            text-decoration: none; 
+            font-weight: 500; 
+            font-size: 0.9em;
+            cursor: pointer;
+        }
+        .back-link:hover {
+            background-color: #0ea5e9; 
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="logo-container">
+            <img src="wide.png" alt="University of Iceland Logo">
+        </div>
+        <h1 id="main-diagram-title" class="text-3xl md:text-4xl font-bold main-title">Data Lifecycle</h1>
+        <p class="text-lg main-subtitle">Data Management</p>
+        <p class="instructions">This page outlines the key stages in managing data throughout a research project. Click stage boxes or underlined items for more details.</p>
+
+        <div id="diagram-main-container">
+            <div class="diagram-row">
+                <div id="stage1Box" class="lifecycle-stage stage-modal-trigger">
+                    <h3 class="stage-title">1. Planning</h3>
+                    <ul class="keywords">
+                        <li>What kind of data does my research require?</li>
+                        <li>Do I need <a href="https://menntavisindastofnun.hi.is/is/gagnlegar-upplysingar-fyrir-rannsakendur" target="_blank" rel="noopener noreferrer">ethical approvals <i class="fas fa-external-link-alt"></i></a> and GDPR requirements (informed consent, data protection).</li>
+                        <li>Develop a Data Management Plan (DMP): <a href="https://www.rannis.is/sjodir/rannsoknir/rannsoknasjodur/" target="_blank" rel="noopener noreferrer">IRF-data management plan <i class="fas fa-external-link-alt"></i></a>.</li>
+                        <li><a href="https://chatgpt.com/g/g-6826f792ee9c8191b08e705ddc616fdb-data-management-guide" target="_blank" rel="noopener noreferrer">GPT Assistant <i class="fas fa-external-link-alt"></i></a> for data management.</li>
+                    </ul>
+                </div>
+                <div id="stage2Box" class="lifecycle-stage stage-modal-trigger"> 
+                    <h3 class="stage-title">2. Data Collection and Question Design</h3>
+                    <ul class="keywords">
+                        <li>Data types: Surveys, tests, interviews, observations</li>
+                        <li>Tools: Qualtrics, audio/video recorders</li>
+                        <li><a href="#" class="interactive-link" data-target="question-design-detail">Design clear, natural, relevant questions</a></li>
+                        <li><a href="#" class="interactive-link" data-target="avoid-bias-etc-detail">Avoid bias, double-barreled and technical language</a></li>
+                        <li>Ensure secure handling of sensitive data.</li>
+                        <li>Strategies for pseudonymization or anonymization.</li>
+                        <li>Document metadata (context, variables, timing)</li>
+                    </ul>
+                </div>
+                <div id="stage3Box" class="lifecycle-stage stage-modal-trigger">
+                    <h3 class="stage-title">3. Data Processing & Cleaning</h3>
+                    <ul class="keywords">
+                        <li>Data cleaning: checking for missing values, outliers, consistency.</li>
+                        <li>Transcription of interviews and standardization of formats.</li>
+                        <li>Use of codebooks and data dictionaries.</li>
+                        <li>Organize file structures and apply naming conventions.</li>
+                        <li><a href="#" class="interactive-link" data-target="data-storing-detail">Data Storing Strategies (Local & Cloud)</a></li> 
+                    </ul>
+                </div>
+            </div>
+
+            <div class="diagram-row">
+                <div class="arrow-container"><div class="arrow-down"><i class="fas fa-arrow-down"></i></div></div>
+                <div class="arrow-container"><div class="arrow-down"><i class="fas fa-arrow-down"></i></div></div>
+                <div class="arrow-container"><div class="arrow-down"><i class="fas fa-arrow-down"></i></div></div>
+            </div>
+
+            <div class="diagram-row-interpretation-sharing">
+                <div id="stage4Box" class="lifecycle-stage stage-modal-trigger">
+                    <h3 class="stage-title">4. Data Analysis</h3>
+                    <ul class="keywords">
+                        <li>Quantitative: Statistical tools (R, SPSS, Jamovi).</li>
+                        <li>Qualitative: Coding, thematic analysis (e.g., NVivo, Atlas.ti).</li>
+                        <li>Version control during analysis (Git-hub)</li>
+                        <li>Documenting steps for transparency and reproducibility.</li>
+                    </ul>
+                </div>
+                 <div class="arrow-container"> <div class="arrow-right"><i class="fas fa-arrow-right"></i></div>
+                </div>
+                <div id="stage5Box" class="lifecycle-stage stage-modal-trigger">
+                    <h3 class="stage-title">5. Interpretation & Visualization</h3>
+                    <ul class="keywords">
+                        <li>Interpreting results in relation to research questions.</li>
+                        <li>Visualization tools: R (ggplot), Python (matplotlib), Excel.</li>
+                        <li>Use of narrative summaries for qualitative insights.</li>
+                        <li>Transparency: describing limitations, assumptions, and uncertainties.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="diagram-row-archiving"> 
+                <div class="arrow-container"><div class="arrow-down"><i class="fas fa-arrow-down"></i></div></div>
+            </div>
+
+            <div class="diagram-row-archiving">
+                <div id="stage6Box" class="lifecycle-stage stage-modal-trigger">
+                    <h3 class="stage-title">6. Publication, Sharing & Archiving</h3>
+                    <ul class="keywords">
+                        <li>Use trusted repositories (e.g., Menntaský, University of Iceland's services).</li>
+                        <li>Open Science: <a href="https://en.rannis.is/activities/open-access/" target="_blank" rel="noopener noreferrer">IRF Open Access <i class="fas fa-external-link-alt"></i></a>, <a href="https://opinvisindi.is/?locale-attribute=en" target="_blank" rel="noopener noreferrer">UI-Opin Vísindi <i class="fas fa-external-link-alt"></i></a></li>
+                        <li>FAIR Principles: <a href="https://datice.is/is/node/4" target="_blank" rel="noopener noreferrer">FAIR principles - UI <i class="fas fa-external-link-alt"></i></a>, 
+                            <a href="https://www.youtube.com/watch?app=desktop&v=0-bSV4dieMI" target="_blank" rel="noopener noreferrer">FAIR principles video <i class="fas fa-video"></i></a></li>
+                        <li>Where and how to share data: <a href="https://datice.is/is" target="_blank" rel="noopener noreferrer">DATICE <i class="fas fa-external-link-alt"></i></a>, Zenodo, institutional repositories.</li>
+                        <li>Choose open formats (CSV, TXT) for longevity.</li>
+                        <li>Archive code, data, and documentation.</li>
+                        <li>Ensure compliance with retention policies (e.g., 5–10 years for research data).</li>
+                    </ul>
+                </div>
+            </div>
+        </div> 
+        
+        <div class="service-box-container">
+            <div class="service-box">
+                <h3>Service at ERI (MVST)</h3>
+                <ul>
+                    <li>What we offer: <a href="https://eri.hi.is/en/services" target="_blank" rel="noopener noreferrer">https://eri.hi.is/en/services <i class="fas fa-external-link-alt"></i></a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="detail-section-container">
+            <section id="question-design-detail" class="detail-section">
+                <h3>Question Design Details</h3>
+                <ul>
+                    <li>Be clear, simple and specific
+                        <ul>
+                            <li class="example-question">Poor: “Do you workout regularly?”</li>
+                            <li class="example-question">Better: “The last 7 days, on how many days did you engage in physical activity for a total of 60 minutes or more per day”</li>
+                        </ul>
+                    </li>
+                </ul>
+                <a class="back-link"><i class="fas fa-arrow-up"></i> Back to Diagram</a>
+            </section>
+
+            <section id="avoid-bias-etc-detail" class="detail-section">
+                <h3>Avoiding Bias, Double-Barreled Questions, and Technical Language</h3>
+                 <ul>
+                    <li>Avoid leading or biased questions
+                        <ul>
+                            <li class="example-question">Biased: “How often do you suffer from anxiety because of your schoolwork?”</li>
+                            <li class="example-question">Better: “In the past month, how often have you felt anxious?”</li>
+                        </ul>
+                    </li>
+                    <li>Avoid double-barrelled question
+                        <ul>
+                            <li class="example-question">Double-barrelled: “How satisfied are you with your courses and your teachers?”</li>
+                            <li class="example-question">Better: “How satisfied are you with your courses?”</li>
+                            <li class="example-question" style="margin-left: 2.5em;">Follow up: “How satisfied are you with your teachers?”</li>
+                        </ul>
+                    </li>
+                    <li>Know your audience
+                        <ul>
+                            <li>When designing questions, you should be aware of the language you use, the tone and even the examples you use should match your audience!</li>
+                        </ul>
+                    </li>
+                    <li>Pre-test your questionnaire
+                        <ul>
+                            <li>This is a crucial step that many skip!</li>
+                        </ul>
+                    </li>
+                </ul>
+                <a class="back-link"><i class="fas fa-arrow-up"></i> Back to Diagram</a>
+            </section>
+
+            <section id="data-storing-detail" class="detail-section">
+                <h3>Data Storing Strategies (Local & Cloud)</h3>
+                <h4>University Cloud Storage Options:</h4>
+                <ul>
+                    <li><strong>Menntaský (University of Iceland Cloud):</strong> Each individual typically has access to 1TB of storage. Suitable for personal research data backups and active files.</li>
+                    <li><strong>Microsoft Teams:</strong> Each Team group has access to 25TB of storage space. Excellent for collaborative projects, sharing files within the research group, and storing larger datasets or project documentation.</li>
+                </ul>
+                <h4>Local Data Storing Best Practices (Before Publication/Archiving):</h4>
+                <ul>
+                    <li><strong>Folder Structure:</strong> Maintain a clear, logical, and consistent folder structure from the beginning of your project.
+                        <ul>
+                            <li class="example-question" style="font-style: normal;">Example: <code>ProjectName/01_Planning_Docs/</code>, <code>ProjectName/02_Ethics_Consent/</code>, <code>ProjectName/03_RawData/</code>, <code>ProjectName/04_ProcessedData/</code>, <code>ProjectName/05_AnonymizedDataForSharing/</code>, <code>ProjectName/06_AnalysisScripts/</code>, <code>ProjectName/07_Manuscripts_Reports/</code>, <code>ProjectName/08_Documentation_Metadata/</code></li>
+                        </ul>
+                    </li>
+                    <li><strong>Raw vs. Processed Data:</strong>
+                        <ul>
+                            <li>Always keep your original, unaltered raw data in a separate, clearly marked folder. Make this read-only if possible to prevent accidental changes.</li>
+                            <li>Work on copies of the data for cleaning, processing, and analysis. Save these processed versions with clear versioning in their respective folders.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Anonymization/Pseudonymization:</strong>
+                        <ul>
+                            <li>If working with sensitive or personal data, create separate anonymized or pseudonymized datasets specifically for analysis and especially for sharing.</li>
+                            <li>Store any de-identification key (linking anonymized data back to identifiable data) extremely securely, separately from the anonymized dataset, and with restricted access. Document this process thoroughly.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Version Control:</strong>
+                        <ul>
+                            <li>For datasets that evolve (e.g., through cleaning or additions) and especially for analysis scripts (R, Python, SPSS syntax), use a version control system like Git (and optionally GitHub/GitLab for remote backup/collaboration).</li>
+                            <li>This helps track changes, revert to previous versions, and understand the history of your data and analysis.</li>
+                        </ul>
+                    </li>
+                    <li><strong>Regular Backups:</strong>
+                        <ul>
+                            <li>Implement a "3-2-1" backup strategy for critical local data: At least <strong>3</strong> copies of your data, on <strong>2</strong> different types of media, with <strong>1</strong> copy off-site.</li>
+                            <li>Use external hard drives, university-provided network drives (if suitable for active research data), or cloud storage (like Menntaský) for backups. Automate backups if possible.</li>
+                        </ul>
+                    </li>
+                    <li><strong>File Naming Conventions:</strong>
+                        <ul>
+                            <li>Establish and consistently use descriptive file names. Include elements like project identifier, data type, date (YYYYMMDD), version number, and a brief description.</li>
+                            <li class="example-question" style="font-style: normal;">Example: <code>MyProject_SurveyData_Raw_20250516_v01.csv</code>, <code>MyProject_AnalysisScript_ThematicCoding_20250601_v03.R</code></li>
+                        </ul>
+                    </li>
+                    <li><strong>Documentation/Metadata for Local Files:</strong>
+                        <ul>
+                            <li>Keep a "README.txt" file in main project folders explaining the folder structure, file naming conventions, and key information about the data and its processing stages.</li>
+                            <li>This complements more formal metadata prepared for sharing/archiving.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <h4>Security for Local Data:</h4>
+                <ul>
+                    <li>Ensure your computer has a strong password and is regularly updated.</li>
+                    <li>Consider encrypting your hard drive or specific folders containing sensitive data.</li>
+                    <li>Be cautious with physical security, especially for laptops or portable storage devices.</li>
+                    <li>Follow any specific data security guidelines provided by the University of Iceland.</li>
+                </ul>
+                <a class="back-link"><i class="fas fa-arrow-up"></i> Back to Diagram</a>
+            </section>
+        </div> 
+
+    </div> 
+
+    <div id="genericContentModal" class="modal-overlay-generic">
+        <div class="modal-content-generic">
+            <button id="closeGenericModalButton" class="modal-close-button-generic" aria-label="Close modal">×</button>
+            <h3 id="modalStageTitle">Stage Title</h3>
+            <div id="modalStageContent">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- JavaScript for Detail Sections (bullet point clicks) ---
+            const interactiveLinks = document.querySelectorAll('a.interactive-link');
+            const detailSections = document.querySelectorAll('.detail-section');
+            const backLinks = document.querySelectorAll('.detail-section a.back-link');
+            const mainDiagramContainer = document.getElementById('diagram-main-container'); 
+
+            interactiveLinks.forEach(link => {
+                link.addEventListener('click', function (event) {
+                    event.preventDefault(); 
+                    const targetId = this.getAttribute('data-target');
+                    
+                    detailSections.forEach(section => {
+                        section.style.display = 'none';
+                    });
+
+                    const targetSection = document.getElementById(targetId);
+                    if (targetSection) {
+                        targetSection.style.display = 'block';
+                        targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                });
+            });
+
+            backLinks.forEach(link => {
+                link.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    const parentSection = this.closest('.detail-section');
+                    if (parentSection) {
+                        parentSection.style.display = 'none';
+                    }
+                    if (mainDiagramContainer) {
+                        mainDiagramContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    } else {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }
+                });
+            });
+
+            // --- JavaScript for Generic Content Modal (stage box clicks) ---
+            const genericModal = document.getElementById('genericContentModal');
+            const modalStageTitle = document.getElementById('modalStageTitle');
+            const modalStageContent = document.getElementById('modalStageContent');
+            const closeGenericModalButton = document.getElementById('closeGenericModalButton');
+            const stageModalTriggers = document.querySelectorAll('.stage-modal-trigger');
+
+            stageModalTriggers.forEach(trigger => {
+                trigger.addEventListener('click', function(event) {
+                    // Prevent click on links within the box from also triggering this modal for the whole box
+                    if (event.target.closest('a') && !event.target.classList.contains('stage-modal-trigger')) { // Ensure the click isn't on an 'a' tag unless it's the box itself
+                        if(event.target.classList.contains('interactive-link')) return; // If it's an interactive link for detail sections, let that JS handle it.
+                        // For other 'a' tags (external links), let them behave normally (open in new tab)
+                        // and don't open the stage modal.
+                        return; 
+                    }
+                    event.preventDefault();
+                    
+                    const stageTitleElement = this.querySelector('.stage-title');
+                    const keywordsElement = this.querySelector('.keywords'); 
+
+                    if (stageTitleElement && keywordsElement) {
+                        modalStageTitle.textContent = stageTitleElement.textContent;
+                        
+                        modalStageContent.innerHTML = ''; 
+                        
+                        const clonedKeywordsList = keywordsElement.cloneNode(true);
+                        // Remove interactive-link class from cloned links to prevent JS conflict in modal
+                        clonedKeywordsList.querySelectorAll('a.interactive-link').forEach(clonedLink => {
+                            clonedLink.classList.remove('interactive-link');
+                            clonedLink.removeAttribute('data-target'); 
+                            // Make them standard links if they had href="#" or keep their external href
+                            if (clonedLink.getAttribute('href') === '#') {
+                                clonedLink.removeAttribute('href'); // Or make them non-clickable spans
+                                // To make them non-clickable spans:
+                                // const span = document.createElement('span');
+                                // span.innerHTML = clonedLink.innerHTML;
+                                // clonedLink.parentNode.replaceChild(span, clonedLink);
+                            }
+                        });
+                        
+                        modalStageContent.appendChild(clonedKeywordsList);
+                        
+                        genericModal.style.display = 'flex';
+                    }
+                });
+            });
+
+            function closeTheGenericModal() {
+                genericModal.style.display = 'none';
+                modalStageContent.innerHTML = ''; 
+            }
+
+            closeGenericModalButton.addEventListener('click', closeTheGenericModal);
+            
+            genericModal.addEventListener('click', function(event) {
+                if (event.target === genericModal) { 
+                    closeTheGenericModal();
+                }
+            });
+            
+            document.addEventListener('keydown', function(event) {
+                if (event.key === "Escape" && genericModal.style.display === 'flex') {
+                    closeTheGenericModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
